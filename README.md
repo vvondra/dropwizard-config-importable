@@ -24,7 +24,7 @@ This can be used to:
 
 ### Gradle
 
-```
+```groovy
 compile 'com.foodpanda:dropwizard-config-importable:1.0.1'
 ```
 
@@ -48,7 +48,7 @@ database:
 `dev.yml`:
 
 ``` yml
-import:
+imports:
    - base.yml
 
 database:
