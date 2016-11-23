@@ -22,6 +22,9 @@ import io.dropwizard.jackson.Jackson;
 import io.dropwizard.validation.BaseValidator;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ImportableConfigurationFactoryTest {
 
@@ -50,11 +53,10 @@ public class ImportableConfigurationFactoryTest {
         Jackson.newObjectMapper(),
         "fp"
     );
-    private File malformedFile;
-    private File emptyFile;
-    private File invalidFile;
-    private File validFile;
+
     private File importingFile;
+
+    private File validFile;
 
     private static File resourceFileName(String resourceName) throws URISyntaxException {
         return new File(Resources.getResource(resourceName).toURI());
@@ -78,9 +80,17 @@ public class ImportableConfigurationFactoryTest {
 
     @Test
     public void importConfigurationFile() throws Exception {
+        final Example base = factory.build(validFile);
+        assertTrue(Boolean.valueOf(base.getProperties().get("debug")));
+        assertEquals("foo", base.getProperties().get("extra"));
+        assertNull(base.getProperties().get("extended"));
+
         final Example example = factory.build(importingFile);
 
         assertEquals("Importing Foodpanda", example.getName());
+        assertFalse(Boolean.valueOf(example.getProperties().get("debug")));
+        assertEquals("foo", example.getProperties().get("extra"));
+        assertEquals("bar", example.getProperties().get("extended"));
     }
 
 }

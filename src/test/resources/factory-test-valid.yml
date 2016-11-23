@@ -1,3 +1,4 @@
 name: Foodpanda
 properties:
-  debug: true
+  debug: "true"
+  extra: "foo"
