@@ -1,5 +1,7 @@
 # dropwizard-config-importable
 
+[![Build Status](https://travis-ci.org/foodpanda/dropwizard-config-importable.svg?branch=master)](https://travis-ci.org/foodpanda/dropwizard-config-importable)
+
 Use configuration imports in [Dropwizard](https://github.com/dropwizard/dropwizard) instead of copy-pasting files for each environment.
 
 In foodpanda, we've been missing a popular Symfony2 feature which [allows to import another file](http://symfony.com/doc/current/service_container/import.html) directly from your configuration file.
