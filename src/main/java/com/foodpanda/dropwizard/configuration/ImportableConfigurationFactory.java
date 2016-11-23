@@ -27,10 +27,14 @@ import static java.util.Objects.requireNonNull;
  *
  * Other original behaviour of the default Dropwizard configuration factory is preserved.
  */
-public class ImportableConfigurationFactory<T> extends YamlConfigurationFactory<T> {
+class ImportableConfigurationFactory<T> extends YamlConfigurationFactory<T> {
 
     private final ObjectMapper objectMapper;
 
+    /*
+     * There is attempt to avoid name-clash if Dropwizard makes
+     * the parent property protected or public
+     */
     private final YAMLFactory overriddenYamlFactory;
 
     private static final String IMPORT_KEY = "imports";
@@ -43,7 +47,7 @@ public class ImportableConfigurationFactory<T> extends YamlConfigurationFactory<
      * @param objectMapper   the Jackson {@link ObjectMapper} to use
      * @param propertyPrefix the system property name prefix used by overrides
      */
-    public ImportableConfigurationFactory(
+    ImportableConfigurationFactory(
         final Class<T> klass,
         final Validator validator,
         final ObjectMapper objectMapper,
@@ -82,14 +86,19 @@ public class ImportableConfigurationFactory<T> extends YamlConfigurationFactory<
                 );
             }
 
+            // Look for the imports array
             if (node.has(IMPORT_KEY) && node.get(IMPORT_KEY).isArray()) {
                 for (JsonNode configImport : node.get(IMPORT_KEY)) {
+                    // The element must be a string path
                     if (configImport.isTextual()) {
+                        // Recurse and load nested configuration and merge the current file
+                        // into the imported one
                         JsonNode imported = loadConfiguration(
                             provider,
                             new File(new File(path).getParent(), configImport.asText()).toString()
                         );
-                        node = JsonUtil.merge(node, imported);
+
+                        node = JsonUtil.merge(imported, node);
                     }
                 }
 
