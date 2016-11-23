@@ -67,3 +67,7 @@ database:
    user: ${PROD_DB_USER}
    logValidationErrors: false
 ```
+## TODO
+
+ - [ ] Circular reference detection
+ - [ ] Support for other than local file resource types
