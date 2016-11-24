@@ -9,7 +9,6 @@ ext {
     dropwizardVersion = "1.0.5"
 }
 
-// In this section you declare the dependencies for your production and test code
 dependencies {
     compile 'io.dropwizard:dropwizard-configuration:' + dropwizardVersion
     compile 'io.dropwizard:dropwizard-jackson:' + dropwizardVersion
