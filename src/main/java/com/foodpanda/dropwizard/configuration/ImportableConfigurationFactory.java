@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
-import org.yaml.snakeyaml.error.YAMLException;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.error.MarkedYAMLException;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.error.YAMLException;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,10 +80,8 @@ class ImportableConfigurationFactory<T> extends YamlConfigurationFactory<T> {
             JsonNode node = objectMapper.readTree(overriddenYamlFactory.createParser(input));
 
             if (node == null) {
-                throw new ConfigurationParsingException(
-                    path,
-                    "Configuration at " + path + " must not be empty"
-                );
+                throw ConfigurationParsingException.builder("Configuration at " + path + " must not be empty")
+                    .build(path);
             }
 
             // Look for the imports array
@@ -110,20 +108,16 @@ class ImportableConfigurationFactory<T> extends YamlConfigurationFactory<T> {
 
             return node;
         } catch (YAMLException e) {
-//            final ConfigurationParsingException.Builder builder = ConfigurationParsingException
-//                .builder("Malformed YAML")
-//                .setCause(e)
-//                .setDetail(e.getMessage());
-//
-//            if (e instanceof MarkedYAMLException) {
-//                builder.setLocation(((MarkedYAMLException) e).getProblemMark());
-//            }
+            final ConfigurationParsingException.Builder builder = ConfigurationParsingException
+                .builder("Malformed YAML")
+                .setCause(e)
+                .setDetail(e.getMessage());
 
-            throw new ConfigurationParsingException(
-                path,
-                "Malformed YAML",
-                e
-            );
+            if (e instanceof MarkedYAMLException) {
+                builder.setLocation(((MarkedYAMLException) e).getProblemMark());
+            }
+
+            throw builder.build(path);
         }
     }
 }
