@@ -10,6 +10,9 @@ ext {
     dropwizardVersion = "1.0.5"
 }
 
+def mavenUser = hasProperty('sonatypeUsername') ? sonatypeUsername : System.getenv('SONATYPE_USER')
+def mavenPass = hasProperty('sonatypePassword') ? sonatypePassword : System.getenv('SONATYPE_PASS')
+
 group 'com.foodpanda'
 version '0.1.0'
 
@@ -20,6 +23,11 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
 task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
     classifier = 'sources'
@@ -28,6 +36,7 @@ task sourcesJar(type: Jar) {
 artifacts {
     archives jar
     archives sourcesJar
+    archives javadocJar
 }
 
 signing {
@@ -40,7 +49,7 @@ uploadArchives {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
+                authentication(userName: mavenUser, password: mavenPass)
             }
 
             pom.project {
