@@ -1,5 +1,6 @@
 apply plugin: 'java'
-apply plugin: 'maven-publish'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 repositories {
     mavenCentral()
@@ -9,6 +10,9 @@ ext {
     dropwizardVersion = "1.0.5"
 }
 
+group 'com.foodpanda'
+version '0.1.0'
+
 dependencies {
     compile 'io.dropwizard:dropwizard-configuration:' + dropwizardVersion
     compile 'io.dropwizard:dropwizard-jackson:' + dropwizardVersion
@@ -16,14 +20,56 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId 'com.foodpanda'
-            artifactId 'dropwizard-config-importable'
-            version '1.0.1'
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
 
-            from components.java
+artifacts {
+    archives jar
+    archives sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                name 'dropwizard-config-importable'
+                packaging 'jar'
+                description 'Use configuration imports in Dropwizard instead of copy-pasting files for each environment'
+                url 'https://github.com/foodpanda/dropwizard-config-importable'
+
+                scm {
+                    url 'scm:git@github.com:foodpanda/dropwizard-config-importable.git'
+                    connection 'scm:git@github.com:foodpanda/dropwizard-config-importable.git'
+                    developerConnection 'scm:git@github.com:foodpanda/dropwizard-config-importable.git'
+                }
+
+                licenses {
+                    license {
+                        name 'MIT License'
+                        url 'https://raw.githubusercontent.com/foodpanda/dropwizard-config-importable/master/LICENSE'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'vvondra'
+                        name 'Vojtěch Vondra'
+                    }
+                }
+            }
         }
     }
 }
