@@ -10,7 +10,7 @@ This can be used to:
  - split a large configuration file into multiple smaller snippets
  - override environment-dependent values
  
-## Installlation
+## Installation
 
 ### Maven
 
