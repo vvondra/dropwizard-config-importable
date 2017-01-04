@@ -67,7 +67,17 @@ database:
    user: ${PROD_DB_USER}
    logValidationErrors: false
 ```
+
+The `import` directive also supports the `glob` syntax accepted by [FileSystem#getPathMatcher](https://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html#getPathMatcher(java.lang.String)):
+
+`config.yml`:
+
+``` yml
+imports:
+   - path/to/childs/**/*.yml
+```
+
 ## TODO
 
  - [ ] Circular reference detection
- - [ ] Support for other than local file resource types
+ - [ ] Support for other than local file resource types (S3)

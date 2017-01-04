@@ -1,0 +1,4 @@
+properties:
+  b:
+    name: "Complex Sample B"
+    debug: "false"

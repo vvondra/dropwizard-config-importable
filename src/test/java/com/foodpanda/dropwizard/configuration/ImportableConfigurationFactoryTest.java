@@ -43,6 +43,15 @@ public class ImportableConfigurationFactoryTest {
         }
     }
 
+    public static class GlobExample {
+        @JsonProperty
+        private Map<String, LinkedHashMap<String, String>> properties = new LinkedHashMap<>();
+
+        public Map<String, LinkedHashMap<String, String>> getProperties() {
+            return properties;
+        }
+    }
+
 
     @After
     public void resetConfigOverrides() {
@@ -71,6 +80,22 @@ public class ImportableConfigurationFactoryTest {
         assertFalse(Boolean.valueOf(example.getProperties().get("debug")));
         assertEquals("foo", example.getProperties().get("extra"));
         assertEquals("bar", example.getProperties().get("extended"));
+    }
+
+    @Test
+    public void importGlobConfigurationFile() throws Exception {
+        final ConfigurationFactory<GlobExample> factory = createFactory(GlobExample.class);
+
+        final File importingGlobFile = resourceFileName("factory-test-importing-glob.yml");
+        final GlobExample example = factory.build(importingGlobFile);
+
+        assertTrue(example.getProperties().containsKey("a"));
+        assertEquals("Complex Sample A", example.getProperties().get("a").get("name"));
+        assertTrue(Boolean.valueOf(example.getProperties().get("a").get("debug")));
+
+        assertTrue(example.getProperties().containsKey("b"));
+        assertEquals("Complex Sample B", example.getProperties().get("b").get("name"));
+        assertFalse(Boolean.valueOf(example.getProperties().get("b").get("debug")));
     }
 
     private static File resourceFileName(String resourceName) throws URISyntaxException {
