@@ -77,6 +77,10 @@ uploadArchives {
                         id 'vvondra'
                         name 'Vojtěch Vondra'
                     }
+                    developer {
+                        id 'aelesbao'
+                        name 'Augusto Elesbão'
+                    }
                 }
             }
         }
