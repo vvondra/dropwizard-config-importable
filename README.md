@@ -10,9 +10,9 @@ This can be used to:
  - split a large configuration file into multiple smaller snippets
  - override environment-dependent values
  
-## Installation
+## Installation
 
-### Maven
+### Maven
 
 ```xml
 <dependencies>
@@ -24,7 +24,7 @@ This can be used to:
 </dependencies>
 ```
 
-### Gradle
+### Gradle
 
 ```groovy
 compile 'com.foodpanda:dropwizard-config-importable:1.0.1'
