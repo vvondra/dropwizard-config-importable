@@ -37,7 +37,7 @@ Find your `HelloApplication.java` class and in the `initialize` method add this 
 bootstrap.setConfigurationFactoryFactory(new ImportableConfigurationFactoryFactory<>());
 ```
 
-## Example
+## Example
 
 `base.yml`:
 
