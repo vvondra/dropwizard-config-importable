@@ -7,6 +7,7 @@ import javax.validation.Validator;
 import io.dropwizard.configuration.ConfigurationFactory;
 import io.dropwizard.configuration.DefaultConfigurationFactoryFactory;
 
+@SuppressWarnings("unused")
 public class ImportableConfigurationFactoryFactory<T> extends DefaultConfigurationFactoryFactory<T> {
     @Override
     public ConfigurationFactory<T> create(

@@ -7,9 +7,12 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.snakeyaml.error.MarkedYAMLException;
 import com.fasterxml.jackson.dataformat.yaml.snakeyaml.error.YAMLException;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.validation.Validator;
 
@@ -89,14 +92,17 @@ class ImportableConfigurationFactory<T> extends YamlConfigurationFactory<T> {
                 for (JsonNode configImport : node.get(IMPORT_KEY)) {
                     // The element must be a string path
                     if (configImport.isTextual()) {
-                        // Recurse and load nested configuration and merge the current file
-                        // into the imported one
-                        JsonNode imported = loadConfiguration(
-                            provider,
-                            new File(new File(path).getParent(), configImport.asText()).toString()
+                        // Recurse and load nested configuration and merge the imported files
+                        // into the current one
+                        ConfigurationFileFinder finder = new ConfigurationFileFinder(
+                            Paths.get(path).getParent(),
+                            configImport.asText()
                         );
 
-                        node = JsonUtil.merge(imported, node);
+                        for (Path file : finder.find()) {
+                            JsonNode imported = loadConfiguration(provider, file.toString());
+                            node = JsonUtil.merge(imported, node);
+                        }
                     }
                 }
 
@@ -104,7 +110,6 @@ class ImportableConfigurationFactory<T> extends YamlConfigurationFactory<T> {
                 // There is no use for it to map the configuration
                 node = ((ObjectNode) node).without(IMPORT_KEY);
             }
-
 
             return node;
         } catch (YAMLException e) {
@@ -118,6 +123,36 @@ class ImportableConfigurationFactory<T> extends YamlConfigurationFactory<T> {
             }
 
             throw builder.build(path);
+        }
+    }
+
+    private static class ConfigurationFileFinder extends SimpleFileVisitor<Path> {
+
+        private final PathMatcher matcher;
+
+        private final Path parent;
+
+        private final Set<Path> filesFound;
+
+        ConfigurationFileFinder(Path parent, String pattern) {
+            this.parent = parent;
+            matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
+            filesFound = new TreeSet<>();
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            Path relativePath = parent.relativize(file);
+            if (relativePath != null && matcher.matches(relativePath)) {
+                filesFound.add(file);
+            }
+
+            return FileVisitResult.CONTINUE;
+        }
+
+        public Set<Path> find() throws IOException {
+            Files.walkFileTree(parent, this);
+            return filesFound;
         }
     }
 }

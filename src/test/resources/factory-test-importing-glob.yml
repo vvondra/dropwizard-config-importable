@@ -1,0 +1,6 @@
+imports:
+ - complex/**/*.yml
+
+properties:
+  a:
+    debug: "true"
